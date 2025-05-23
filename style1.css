@@ -52,44 +52,6 @@ body {
   align-items: center;
 }
 
-@keyframes beat {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes smallHeartFly {
-  0% {
-    bottom: 0;
-    transform: translate(-50%, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    bottom: 100%;
-    transform: translate(-50%, -100vh) scale(0.5);
-    opacity: 0;
-  }
-}
-
-.smallHeart {
-  position: fixed;
-  bottom: 0;
-  transform: translate(-50%, 0);
-  opacity: 1;
-  animation: smallHeartFly 1.5s forwards;
-  pointer-events: none;
-  z-index: 10000;
-}
-
 .main-title {
   position: absolute;
   top: 0;
@@ -99,6 +61,7 @@ body {
   color: #ff69b4;
   margin-top: 50px;
   z-index: 10;
+  animation: blink 1.5s infinite;
 }
 
 .main-container {
@@ -126,70 +89,78 @@ body {
 }
 
 .panel-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: cover;
-  border-radius: 15px;
+  max-width: 400px;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 0;
 }
 
 .right-panel {
   flex: 1;
   position: relative;
   height: 100%;
-}
-
-.heart-link {
-  position: absolute;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: transparent;
+}
+
+#giftBox {
+  width: 300px;
+  height: 300px;
   cursor: pointer;
-  text-decoration: none;
-  transition: none;
-}
-
-.heart-link:hover .heart-icon-text,
-.heart-link:active .heart-icon-text {
-  animation: none !important;
-  transform: none !important;
-}
-
-.heart-icon-text {
-  font-size: 150px;
-  line-height: 1;
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  animation: heartbeat 1.2s infinite ease-in-out;
-}
-
-.heart-text {
-  position: absolute;
+  animation: shake 0.8s infinite;
+  transition: transform 1s cubic-bezier(.86,-0.41,.19,1.44), opacity 0.5s;
   z-index: 2;
-  font-size: 24px;
-  color: white;
-  text-align: center;
-  white-space: nowrap;
+  position: relative;
 }
 
-.home-heart {
-  top: 30%;
-  left: 30%;
-  transform: translate(-50%, -50%);
+#giftBox.opened {
+  animation: none;
+  transform: translateY(120vh) scale(1.1) rotate(-10deg);
+  opacity: 0;
 }
 
-.third-heart {
-  top: 75%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+@keyframes shake {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
 }
 
-.game-heart {
-  top: 45%;
-  left: 85%;
-  transform: translate(-50%, -50%);
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes smallHeartFly {
+  0% {
+    bottom: 0;
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    bottom: 100%;
+    transform: translate(-50%, -100vh) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.smallHeart {
+  position: fixed;
+  bottom: 0;
+  transform: translate(-50%, 0);
+  opacity: 1;
+  animation: smallHeartFly 1.5s forwards;
+  pointer-events: none;
+  z-index: 10000;
 }
 
 .album-image {
@@ -204,3 +175,18 @@ body {
   will-change: transform;
 }
 
+#finalMessage {
+  white-space: nowrap;
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+  user-select: none;
+  opacity: 0;
+  transition: opacity 1s ease;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10001;
+}

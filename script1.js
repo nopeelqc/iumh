@@ -72,15 +72,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.querySelector('.third-heart').addEventListener('click', (e) => {
-    e.preventDefault();
+  const giftBox = document.getElementById('giftBox');
+  const mainContent = document.getElementById('mainContent');
+  const heartEffectPage = document.getElementById('heartEffectPage');
+  const albumContainer = document.getElementById('albumImagesContainer');
+  const finalMessage = document.getElementById('finalMessage');
 
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('intro').style.display = 'none';
+  let giftClickCount = 0;
+  let giftOpened = false;
 
-    const heartEffectPage = document.getElementById('heartEffectPage');
-    heartEffectPage.style.display = 'block';
+  giftBox.addEventListener('click', () => {
+    if (giftOpened) return;
+    giftClickCount++;
+    giftBox.style.animation = 'none';
+    giftBox.offsetHeight;
+    giftBox.style.animation = 'shake 0.8s infinite';
 
+    if (giftClickCount >= 10) {
+      giftOpened = true;
+      giftBox.classList.add('opened');
+      setTimeout(() => {
+        mainContent.style.display = 'none';
+        heartEffectPage.style.display = 'block';
+        startHeartCanvas();
+        albumIndex = 0;
+        spawnAlbumImages();
+      }, 1000);
+    }
+  });
+
+  function startHeartCanvas() {
     const canvas = document.getElementById('heartCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -129,80 +150,92 @@ document.addEventListener('DOMContentLoaded', () => {
       requestAnimationFrame(animate);
     }
     animate();
+  }
 
-    const albumContainer = document.getElementById('albumImagesContainer');
-    const albumImagesSrc = [
-      'image2.jpg',
-      'image3.jpg',
-      'image8.jpg',
-      'image7.jpg',
-      'image6.jpg',
-      'image5.jpg',
-      'image4.jpg'
-    ];
-    let albumIndex = 0;
+  const albumImagesSrc = [
+    'image2.jpg',
+    'image3.jpg',
+    'image8.jpg',
+    'image7.jpg',
+    'image6.jpg',
+    'image5.jpg',
+    'image4.jpg'
+  ];
+  let albumIndex = 0;
 
-    function createAlbumImage(src, isLast) {
-      const img = document.createElement('img');
-      img.src = src;
-      img.className = 'album-image';
-      img.style.width = '260px';
-      img.style.height = '260px';
-      img.style.left = `${Math.random() * 80 + 10}%`;
-      img.style.bottom = `-150px`;
-      const rotateDeg = (Math.random() * 40) - 20;
-      img.style.transform = `rotate(${rotateDeg}deg) translateY(0)`;
-      albumContainer.appendChild(img);
+  function createAlbumImage(src, isLast) {
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'album-image';
+    img.style.width = '260px';
+    img.style.height = '260px';
+    img.style.left = `${Math.random() * 80 + 10}%`;
+    img.style.bottom = `-150px`;
+    const rotateDeg = (Math.random() * 40) - 20;
+    img.style.transform = `rotate(${rotateDeg}deg) translateY(0)`;
+    albumContainer.appendChild(img);
 
-      let start = null;
-      function step(timestamp) {
-        if (!start) start = timestamp;
-        const elapsed = timestamp - start;
-        const duration = 6000;
-        const progress = Math.min(elapsed / duration, 1);
-        const translateY = -window.innerHeight - 180;
-        img.style.transform = `rotate(${rotateDeg}deg) translateY(${progress * translateY}px)`;
-        if (progress < 1) {
-          requestAnimationFrame(step);
-        } else {
-          albumContainer.removeChild(img);
-          if (isLast) {
-            heartEffectPage.style.display = 'none';
-            const main = document.getElementById('mainContent');
-            main.style.display = 'flex';
-            main.style.opacity = '0';
-
-            let op = 0;
-            const fade = setInterval(() => {
-              op += 0.05;
-              main.style.opacity = op;
-              if (op >= 1) clearInterval(fade);
-            }, 20);
-          }
+    let start = null;
+    function step(timestamp) {
+      if (!start) start = timestamp;
+      const elapsed = timestamp - start;
+      const duration = 6000;
+      const progress = Math.min(elapsed / duration, 1);
+      const translateY = -window.innerHeight - 180;
+      img.style.transform = `rotate(${rotateDeg}deg) translateY(${progress * translateY}px)`;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        albumContainer.removeChild(img);
+        if (isLast) {
+          finalMessage.textContent = "Anh không còn ghen tị nữa";
+          finalMessage.style.display = 'block';
+          finalMessage.style.opacity = '1';
+          setTimeout(() => {
+            finalMessage.style.opacity = '0';
+            setTimeout(() => {
+              finalMessage.textContent = "Vì anh là người giải cứu thế giới kiếp trước !";
+              finalMessage.style.opacity = '1';
+              setTimeout(() => {
+                finalMessage.style.opacity = '0';
+                setTimeout(() => {
+                  finalMessage.style.display = 'none';
+                  heartEffectPage.style.display = 'none';
+                  mainContent.style.display = 'flex';
+                  mainContent.style.opacity = '0';
+                  let op = 0;
+                  const fade = setInterval(() => {
+                    op += 0.05;
+                    mainContent.style.opacity = op;
+                    if (op >= 1) clearInterval(fade);
+                  }, 20);
+                  giftBox.classList.remove('opened');
+                  giftClickCount = 0;
+                  giftOpened = false;
+                }, 1000);
+              }, 2000);
+            }, 1000);
+          }, 2000);
         }
       }
-      requestAnimationFrame(step);
     }
+    requestAnimationFrame(step);
+  }
 
-    function spawnAlbumImages() {
-      if (albumIndex >= albumImagesSrc.length) return;
-      const isLast = albumIndex === albumImagesSrc.length - 1;
-      createAlbumImage(albumImagesSrc[albumIndex], isLast);
-      albumIndex++;
-      setTimeout(spawnAlbumImages, 1000);
-    }
-
-    spawnAlbumImages();
-  });
+  function spawnAlbumImages() {
+    if (albumIndex >= albumImagesSrc.length) return;
+    const isLast = albumIndex === albumImagesSrc.length - 1;
+    createAlbumImage(albumImagesSrc[albumIndex], isLast);
+    albumIndex++;
+    setTimeout(spawnAlbumImages, 1000);
+  }
 
   const audio = document.getElementById('bgMusic');
   if (audio) {
     audio.volume = 0.9;
 
     const playAudio = () => {
-      audio.play().catch((err) => {
-        console.warn('Không thể phát audio:', err);
-      });
+      audio.play().catch(() => {});
       window.removeEventListener('click', playAudio);
       window.removeEventListener('keydown', playAudio);
     };
